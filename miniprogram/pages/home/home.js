@@ -1,27 +1,58 @@
-﻿const { appConfig, getDataBundle } = require('../../utils/data')
-const {
-    getLitEvents,
-    lightEvent,
-    isEventLit,
-    getFavoriteEvents,
-    toggleFavoriteEvent,
-} = require('../../utils/storage')
+const { appConfig, getDataBundle } = require('../../utils/data')
+const { getLitLocations, isLocationLit, lightLocation } = require('../../utils/storage')
 
-function decorateMapLocations(allLocations, selectedAreaId, selectedLocationId, litIds) {
-    return allLocations.map((item) => ({
+function decorateMapLocations(allLocations, selectedAreaId, selectedLocationId, litLocationIds) {
+    return (allLocations || []).map((item) => ({
         ...item,
         isActive: item.id === selectedLocationId,
         isInArea: item.areaId === selectedAreaId,
-        isLit: litIds.includes(item.id),
+        isLit: litLocationIds.includes(item.id),
     }))
 }
 
-function decorateLocationTabs(allLocations, areaId, selectedLocationId, litIds) {
-    return allLocations.filter((item) => item.areaId === areaId).map((item) => ({
+function decorateLocationTabs(allLocations, areaId, selectedLocationId, litLocationIds) {
+    return (allLocations || [])
+        .filter((item) => item.areaId === areaId)
+        .map((item) => ({
+            ...item,
+            isActive: item.id === selectedLocationId,
+            isLit: litLocationIds.includes(item.id),
+        }))
+}
+
+function decorateRecommendedEvents(allEvents) {
+    const cardTones = ['green', 'blue']
+    return (allEvents || []).slice(0, 2).map((item, index) => ({
         ...item,
-        isActive: item.id === selectedLocationId,
-        isLit: litIds.includes(item.id),
+        cardTone: cardTones[index % cardTones.length],
+        spotLine: item.highlight || item.shortDesc,
     }))
+}
+
+function buildMapHint(locationName, count) {
+    if (!locationName) {
+        return '点一点地图，看看哪儿有新鲜事'
+    }
+    if (count <= 0) {
+        return `${locationName}现在比较安静，去别处看看新的奇遇吧`
+    }
+    if (count === 1) {
+        return `${locationName}今天有 1 个奇遇，刚好慢慢逛`
+    }
+    return `${locationName}今天有 ${count} 个奇遇，跟着微仔去看看`
+}
+
+function buildSpotlightHint(locationName, count) {
+    if (!locationName) {
+        return '这里好像有热闹正在发生'
+    }
+    if (count <= 0) {
+        return `${locationName}暂时没有安排，换个点位继续探索吧`
+    }
+    if (count === 1) {
+        return `微仔在 ${locationName} 找到 1 个新鲜事`
+    }
+    return `微仔在 ${locationName} 找到 ${count} 个新鲜事`
 }
 
 function getRuntimeMode() {
@@ -32,34 +63,12 @@ function getRuntimeMode() {
     return appConfig.mode
 }
 
-function collectLitLocationIds(allEvents, litEventIds) {
-    const litSet = new Set(litEventIds)
-    const locationSet = new Set()
-        ; (allEvents || []).forEach((item) => {
-            if (litSet.has(item.id)) {
-                locationSet.add(item.locationId)
-            }
-        })
-    return Array.from(locationSet)
-}
-
-function decorateRecommendedEvents(allEvents, litEventIds, favoriteEventIds) {
-    const litSet = new Set(litEventIds)
-    const favoriteSet = new Set(favoriteEventIds)
-    return (allEvents || []).map((item) => ({
-        ...item,
-        isLit: litSet.has(item.id),
-        isFavorited: favoriteSet.has(item.id),
-    }))
-}
-
 Page({
     data: {
         appConfig,
         areas: [],
         currentMode: 'special',
         topicTitle: '',
-        topicSubtitle: '',
         selectedAreaId: 'center',
         selectedLocationId: 'zhongcao',
         locationTabs: [],
@@ -67,10 +76,11 @@ Page({
         recommendedEvents: [],
         currentArea: null,
         currentLocation: null,
-        litEventIds: [],
-        favoriteEventIds: [],
         litLocationIds: [],
         isCurrentLocationLit: false,
+        mapHint: '点一点地图，看看哪儿有新鲜事',
+        spotlightHint: '这里好像有热闹正在发生',
+        locationEventCount: 0,
         showMascotImage: true,
     },
 
@@ -96,7 +106,7 @@ Page({
         wx.showToast({
             title: appliedMode === 'special' ? '切回专题版啦' : '已切到通用版骨架',
             icon: 'none',
-            duration: 1300,
+            duration: 1200,
         })
     },
 
@@ -113,66 +123,32 @@ Page({
         if (!locationId) {
             return
         }
+
         const targetLocation = this.getLocationById(locationId)
         if (!targetLocation) {
             return
         }
 
-        const areaId = targetLocation.areaId
-        const litEventIds = getLitEvents()
-        const favoriteEventIds = getFavoriteEvents()
-        const litLocationIds = collectLitLocationIds(this.runtimeEvents || [], litEventIds)
-        this.setData({
-            selectedAreaId: areaId,
-            selectedLocationId: locationId,
-            litEventIds,
-            favoriteEventIds,
-            litLocationIds,
-        })
-        this.refreshVisualState(areaId, locationId, litEventIds, favoriteEventIds)
+        const litLocationIds = getLitLocations()
+        this.refreshVisualState(targetLocation.areaId, locationId, litLocationIds)
     },
 
-    onLightEvent(e) {
-        const { eventId } = e.currentTarget.dataset
-        if (!eventId) {
+    onLightLocation() {
+        const { selectedLocationId, selectedAreaId } = this.data
+        if (!selectedLocationId) {
             return
         }
 
-        const alreadyLit = isEventLit(eventId)
+        const alreadyLit = isLocationLit(selectedLocationId)
         if (!alreadyLit) {
-            lightEvent(eventId)
+            lightLocation(selectedLocationId)
         }
 
-        const litEventIds = getLitEvents()
-        const favoriteEventIds = getFavoriteEvents()
-        this.setData({ litEventIds })
-        this.refreshVisualState(this.data.selectedAreaId, this.data.selectedLocationId, litEventIds, favoriteEventIds)
+        const litLocationIds = getLitLocations()
+        this.refreshVisualState(selectedAreaId, selectedLocationId, litLocationIds)
 
         wx.showToast({
-            title: alreadyLit ? '这个奇遇已经点亮啦' : '奇遇点亮成功',
-            icon: 'none',
-            duration: 1400,
-        })
-    },
-
-    onToggleFavoriteEvent(e) {
-        const { eventId } = e.currentTarget.dataset
-        if (!eventId) {
-            return
-        }
-
-        const nextFavorites = toggleFavoriteEvent(eventId)
-        const isFavorited = nextFavorites.includes(eventId)
-        const litEventIds = getLitEvents()
-
-        this.setData({
-            favoriteEventIds: nextFavorites,
-            litEventIds,
-        })
-        this.refreshVisualState(this.data.selectedAreaId, this.data.selectedLocationId, litEventIds, nextFavorites)
-
-        wx.showToast({
-            title: isFavorited ? '已收藏，下次就去' : '已取消收藏',
+            title: alreadyLit ? '这个点位已经点亮啦' : '点位点亮成功',
             icon: 'none',
             duration: 1200,
         })
@@ -189,6 +165,7 @@ Page({
         if (!eventId) {
             return
         }
+
         wx.navigateTo({
             url: `/pages/detail/detail?id=${eventId}&mode=${this.data.currentMode}`,
         })
@@ -218,22 +195,13 @@ Page({
             selectedLocationId = fallbackLocationId
         }
 
-        const litEventIds = getLitEvents()
-        const favoriteEventIds = getFavoriteEvents()
-        const litLocationIds = collectLitLocationIds(runtimeEvents, litEventIds)
         this.setData({
             areas: runtimeAreas,
             currentMode: runtimeMode,
             topicTitle: bundle.topic ? bundle.topic.title : appConfig.specialTopicTitle,
-            topicSubtitle: bundle.topic ? bundle.topic.subtitle : appConfig.specialTopicSubtitle,
-            selectedAreaId,
-            selectedLocationId,
-            litEventIds,
-            favoriteEventIds,
-            litLocationIds,
         })
 
-        this.refreshVisualState(selectedAreaId, selectedLocationId, litEventIds, favoriteEventIds)
+        this.refreshVisualState(selectedAreaId, selectedLocationId, getLitLocations())
     },
 
     getAreaById(areaId) {
@@ -254,38 +222,44 @@ Page({
 
     syncByArea(areaId) {
         const areaLocations = this.getLocationsByArea(areaId)
-        const nextLocation = areaLocations.length > 0 ? areaLocations[0].id : ''
-        const litEventIds = getLitEvents()
-        const favoriteEventIds = getFavoriteEvents()
-        const litLocationIds = collectLitLocationIds(this.runtimeEvents || [], litEventIds)
-
-        this.setData({
-            selectedAreaId: areaId,
-            selectedLocationId: nextLocation,
-            litEventIds,
-            favoriteEventIds,
-            litLocationIds,
-        })
-
-        this.refreshVisualState(areaId, nextLocation, litEventIds, favoriteEventIds)
+        const nextLocationId = areaLocations.length > 0 ? areaLocations[0].id : ''
+        this.refreshVisualState(areaId, nextLocationId, getLitLocations())
     },
 
-    refreshVisualState(areaId, locationId, litEventIds, favoriteEventIds) {
-        const currentArea = this.getAreaById(areaId)
-        const currentLocation = this.getLocationById(locationId)
-        const recommendedEventsRaw = this.getEventsByLocation(locationId)
-        const runtimeFavorites = favoriteEventIds || this.data.favoriteEventIds || getFavoriteEvents()
-        const recommendedEvents = decorateRecommendedEvents(recommendedEventsRaw, litEventIds, runtimeFavorites)
-        const litLocationIds = collectLitLocationIds(this.runtimeEvents || [], litEventIds)
+    refreshVisualState(areaId, locationId, litLocationIds) {
+        const runtimeAreas = this.runtimeAreas || []
+        const runtimeLocations = this.runtimeLocations || []
+
+        let nextAreaId = areaId
+        if (!runtimeAreas.some((item) => item.id === nextAreaId)) {
+            nextAreaId = runtimeAreas.length > 0 ? runtimeAreas[0].id : ''
+        }
+
+        const areaLocations = runtimeLocations.filter((item) => item.areaId === nextAreaId)
+        let nextLocationId = locationId
+        if (!areaLocations.some((item) => item.id === nextLocationId)) {
+            nextLocationId = areaLocations.length > 0 ? areaLocations[0].id : ''
+        }
+
+        const currentArea = this.getAreaById(nextAreaId)
+        const currentLocation = this.getLocationById(nextLocationId)
+        const locationEvents = this.getEventsByLocation(nextLocationId)
+        const recommendedEvents = decorateRecommendedEvents(locationEvents)
+        const locationName = currentLocation ? currentLocation.name : ''
 
         this.setData({
+            selectedAreaId: nextAreaId,
+            selectedLocationId: nextLocationId,
             currentArea,
             currentLocation,
-            locationTabs: decorateLocationTabs(this.runtimeLocations || [], areaId, locationId, litLocationIds),
-            mapLocations: decorateMapLocations(this.runtimeLocations || [], areaId, locationId, litLocationIds),
+            locationTabs: decorateLocationTabs(runtimeLocations, nextAreaId, nextLocationId, litLocationIds),
+            mapLocations: decorateMapLocations(runtimeLocations, nextAreaId, nextLocationId, litLocationIds),
             recommendedEvents,
             litLocationIds,
-            isCurrentLocationLit: litLocationIds.includes(locationId),
+            isCurrentLocationLit: litLocationIds.includes(nextLocationId),
+            locationEventCount: locationEvents.length,
+            mapHint: buildMapHint(locationName, locationEvents.length),
+            spotlightHint: buildSpotlightHint(locationName, locationEvents.length),
         })
     },
 })
