@@ -1,0 +1,124 @@
+/** app.wxss - 微仔的奇遇地图骨架主题 */
+page {
+  --weizai-green: #BFEA7C;
+  --weizai-grass: #DDF3B2;
+  --weizai-leaf: #8CCB5E;
+  --weizai-sky: #A9DDF7;
+  --weizai-lemon: #F7D85E;
+  --weizai-pink: #F6A7C8;
+  --weizai-cream: #FFFBEF;
+  --weizai-ivory: #F3F1E8;
+  --weizai-brown: #6B563C;
+  --weizai-sub-brown: #8C7B68;
+  --card-radius: 28rpx;
+  --pill-radius: 999rpx;
+  --soft-shadow: 0 10rpx 28rpx rgba(107, 86, 60, 0.08);
+
+  min-height: 100%;
+  color: var(--weizai-brown);
+  background: linear-gradient(180deg, #FFFBEF 0%, #F8F6EC 45%, #F2F7E8 100%);
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+view,
+text,
+button,
+input,
+image,
+scroll-view {
+  box-sizing: border-box;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 28rpx 24rpx calc(40rpx + env(safe-area-inset-bottom));
+}
+
+.card {
+  background: #FFFBEF;
+  border-radius: var(--card-radius);
+  box-shadow: var(--soft-shadow);
+}
+
+.jelly-btn {
+  border: none;
+  border-radius: var(--pill-radius);
+  padding: 18rpx 28rpx;
+  font-size: 28rpx;
+  line-height: 1.2;
+  color: #4d3f2b;
+  background: linear-gradient(180deg, #CFF59A 0%, #BFEA7C 100%);
+  box-shadow: 0 12rpx 22rpx rgba(140, 203, 94, 0.35);
+}
+
+.jelly-btn::after {
+  border: none;
+}
+
+.jelly-btn.ghost {
+  background: linear-gradient(180deg, #c5ecff 0%, #A9DDF7 100%);
+  box-shadow: 0 12rpx 22rpx rgba(169, 221, 247, 0.35);
+}
+
+.sticker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 18rpx;
+  border-radius: 20rpx;
+  color: #5f4b34;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.sticker.green {
+  background: #DDF3B2;
+}
+
+.sticker.blue {
+  background: #D6EEFC;
+}
+
+.sticker.yellow {
+  background: #FFF0AE;
+}
+
+.sticker.pink {
+  background: #FFD3E4;
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--weizai-brown);
+}
+
+.section-subtitle {
+  font-size: 24rpx;
+  color: var(--weizai-sub-brown);
+}
+
+.empty-state {
+  margin-top: 30rpx;
+  padding: 44rpx 28rpx;
+  text-align: center;
+  border-radius: var(--card-radius);
+  background: #FFFBEF;
+  box-shadow: var(--soft-shadow);
+}
+
+.empty-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  margin: 0 auto 18rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #F7D85E, #F6A7C8);
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}

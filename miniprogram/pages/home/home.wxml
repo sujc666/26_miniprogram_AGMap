@@ -1,0 +1,136 @@
+﻿<view class="page-shell home-page {{currentMode === 'special' ? 'mode-special' : 'mode-general'}}">
+  <view class="banner card">
+    <view class="banner-text">
+      <text class="banner-title">{{appConfig.appName}}</text>
+      <text class="banner-subtitle">{{topicSubtitle || appConfig.specialTopicSubtitle}}</text>
+      <view class="banner-tags">
+        <text class="sticker green">{{currentMode === 'special' ? '专题版' : '通用版'}}</text>
+        <text class="sticker blue">{{topicTitle || '社团导览中'}}</text>
+      </view>
+      <view class="mode-switch-line">
+        <button class="mode-switch-btn" bindtap="onToggleMode">
+          {{currentMode === 'special' ? '切到通用版' : '切到专题版'}}
+        </button>
+      </view>
+    </view>
+    <view class="banner-mascot">
+      <!-- 可替换为微仔首页 Banner 插画素材，建议尺寸 360x360 -->
+      <image
+        wx:if="{{showMascotImage}}"
+        class="mascot-img"
+        src="{{appConfig.mascotImage}}"
+        mode="aspectFill"
+        binderror="onMascotImageError"
+      />
+      <view wx:else class="mascot-fallback">微仔</view>
+    </view>
+    <view wx:if="{{currentMode === 'special'}}" class="festival-halo halo-a"></view>
+    <view wx:if="{{currentMode === 'special'}}" class="festival-halo halo-b"></view>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">先选大区，再挑点位</text>
+    <text class="section-subtitle">{{topicSubtitle || '点一点地图，看看哪儿有新鲜事'}}</text>
+  </view>
+
+  <scroll-view class="tab-scroll" scroll-x enable-flex show-scrollbar="false">
+    <view class="tab-row">
+      <view
+        wx:for="{{areas}}"
+        wx:key="id"
+        class="area-tab {{selectedAreaId === item.id ? 'active' : ''}}"
+        data-area-id="{{item.id}}"
+        bindtap="onAreaTap"
+      >
+        <text class="tab-name">{{item.name}}</text>
+        <text class="tab-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <scroll-view class="tab-scroll" scroll-x enable-flex show-scrollbar="false">
+    <view class="tab-row">
+      <view
+        wx:for="{{locationTabs}}"
+        wx:key="id"
+        class="point-tab {{item.isActive ? 'active' : ''}} {{item.isLit ? 'lit' : ''}}"
+        data-location-id="{{item.id}}"
+        bindtap="onLocationTap"
+      >
+        <text class="point-name">{{item.name}}</text>
+        <text class="point-mark">{{item.isLit ? '已点亮' : item.shortDesc}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="map-card card">
+    <view class="map-area-title">{{currentArea ? currentArea.name : '校园'}}区域导览图</view>
+    <view class="map-canvas">
+      <view class="zone zone-center {{selectedAreaId === 'center' ? 'zone-on' : ''}}">中间</view>
+      <view class="zone zone-west {{selectedAreaId === 'west' ? 'zone-on' : ''}}">西边</view>
+      <view class="zone zone-east {{selectedAreaId === 'east' ? 'zone-on' : ''}}">东边</view>
+
+      <view
+        wx:for="{{mapLocations}}"
+        wx:key="id"
+        class="map-point {{item.isInArea ? '' : 'dim'}} {{item.isActive ? 'active' : ''}} {{item.isLit ? 'lit' : ''}}"
+        style="left: {{item.x}}%; top: {{item.y}}%;"
+        data-location-id="{{item.id}}"
+        bindtap="onLocationTap"
+      >
+        <text class="point-dot"></text>
+        <text class="point-label">{{item.name}}</text>
+      </view>
+    </view>
+    <view class="map-caption">
+      <text>当前点位：{{currentLocation ? currentLocation.name : '暂未选择'}}</text>
+      <text>这里好像有热闹正在发生</text>
+    </view>
+  </view>
+
+  <view class="section-head event-head">
+    <text class="section-title">{{currentLocation ? currentLocation.name : '当前点位'}}活动推荐</text>
+    <text class="section-subtitle">点击卡片查看详情，再决定要不要加入计划</text>
+  </view>
+
+  <view wx:if="{{recommendedEvents.length === 0}}" class="empty-state">
+    <view class="empty-avatar"></view>
+    <text>这处点位正在布置中，去别处看看新的奇遇吧。</text>
+  </view>
+
+  <view
+    wx:for="{{recommendedEvents}}"
+    wx:key="id"
+    class="event-card card"
+    data-event-id="{{item.id}}"
+    bindtap="onOpenDetail"
+  >
+    <view class="event-top">
+      <text class="event-title">{{item.title}}</text>
+      <text class="event-category">{{item.category}}</text>
+    </view>
+    <text class="event-meta">{{item.club}} · {{item.time}}</text>
+    <text class="event-meta">地点：{{item.locationName}}</text>
+    <text class="event-desc line-clamp-2">{{item.shortDesc}}</text>
+    <view class="event-action-row">
+      <button
+        class="event-light-btn {{item.isLit ? 'lit' : ''}}"
+        data-event-id="{{item.id}}"
+        catchtap="onLightEvent"
+      >
+        {{item.isLit ? '已点亮' : '已去过，点亮奇遇'}}
+      </button>
+      <button
+        class="event-fav-btn {{item.isFavorited ? 'fav' : ''}}"
+        data-event-id="{{item.id}}"
+        catchtap="onToggleFavoriteEvent"
+      >
+        {{item.isFavorited ? '已收藏' : '收藏一下，下次就去'}}
+      </button>
+    </view>
+  </view>
+
+  <view class="action-row bottom-action-row">
+    <button class="bottom-discover-btn" bindtap="onGoDiscover">去奇遇页看看全部活动</button>
+  </view>
+</view>

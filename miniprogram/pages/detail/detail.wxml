@@ -1,0 +1,79 @@
+<view class="page-shell detail-page">
+  <block wx:if="{{event}}">
+    <view class="cover card">
+      <image
+        wx:if="{{event.coverImage && showCoverImage}}"
+        class="cover-image"
+        src="{{event.coverImage}}"
+        mode="aspectFill"
+        binderror="onCoverImageError"
+      />
+      <view wx:else class="cover-fallback" style="background: {{event.coverColor || '#BFEA7C'}};">
+        <text class="cover-sticker">微仔推荐</text>
+        <text class="cover-title">{{event.title}}</text>
+        <text class="cover-sub">{{event.club}}</text>
+      </view>
+      <view class="cover-deco star"></view>
+      <view class="cover-deco flower"></view>
+    </view>
+
+    <view class="content card">
+      <text class="detail-title">{{event.title}}</text>
+      <text class="detail-club">{{event.club}}</text>
+
+      <view class="meta-grid">
+        <view class="meta-item">
+          <text class="meta-label">分类</text>
+          <text class="meta-value">{{event.category}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">时间</text>
+          <text class="meta-value">{{event.time}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">地点</text>
+          <text class="meta-value">{{event.locationName}}</text>
+        </view>
+      </view>
+
+      <view class="tag-row">
+        <text wx:for="{{event.tags}}" wx:key="*this" class="tag">{{item}}</text>
+      </view>
+
+      <view class="para-block">
+        <text class="para-title">一句话亮点</text>
+        <text class="para-content">{{event.highlight}}</text>
+      </view>
+
+      <view class="para-block">
+        <text class="para-title">详细介绍</text>
+        <text class="para-content">{{event.detailDesc}}</text>
+      </view>
+
+      <view class="para-block">
+        <text class="para-title">适合人群</text>
+        <text class="para-content">{{event.suitable}}</text>
+      </view>
+
+      <view class="para-block">
+        <text class="para-title">参与方式</text>
+        <text class="para-content">{{event.joinWay}}</text>
+      </view>
+
+      <view class="action-row">
+        <button class="detail-light-btn {{isLit ? 'lit' : ''}}" bindtap="onLightEvent">
+          {{isLit ? '已点亮' : '已去过，点亮奇遇'}}
+        </button>
+        <button class="detail-fav-btn {{isFavorited ? 'fav' : ''}}" bindtap="onToggleFavorite">
+          {{isFavorited ? '已收藏' : '收藏一下，下次就去'}}
+        </button>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="empty-state">
+    <view class="empty-avatar"></view>
+    <text>活动信息暂时不可用，去别处看看新的奇遇吧。</text>
+    <button class="jelly-btn ghost back-home" bindtap="onBack">返回</button>
+  </view>
+</view>

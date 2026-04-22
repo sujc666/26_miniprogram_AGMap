@@ -1,0 +1,80 @@
+﻿<view class="page-shell profile-page">
+  <view class="hero card">
+    <view class="hero-left">
+      <text class="section-title">我的奇遇</text>
+      <text class="section-subtitle">和微仔一起记录你的探索轨迹</text>
+      <view class="title-badge">{{titleName}}</view>
+      <view class="mode-row">
+        <text class="mode-pill">当前：{{modeLabel}}</text>
+        <button class="mode-switch" bindtap="onToggleMode">
+          {{currentMode === 'special' ? '切到通用版' : '切回专题版'}}
+        </button>
+      </view>
+    </view>
+    <view class="hero-mascot">
+      <!-- 可替换为微仔“我的页”头图，建议尺寸 280x280 -->
+      <image
+        wx:if="{{showMascotImage}}"
+        class="hero-image"
+        src="{{appConfig.defaultBannerImage}}"
+        mode="aspectFill"
+        binderror="onMascotImageError"
+      />
+      <view wx:else class="hero-fallback">WZ</view>
+    </view>
+  </view>
+
+  <view class="stats-row">
+    <view class="stat card">
+      <text class="stat-value">{{litCount}}</text>
+      <text class="stat-label">已点亮点位</text>
+    </view>
+    <view class="stat card">
+      <text class="stat-value">{{favoriteCount}}</text>
+      <text class="stat-label">已收藏活动</text>
+    </view>
+  </view>
+
+  <view class="block card">
+    <view class="block-head">
+      <text class="block-title">已点亮点位</text>
+      <text class="block-sub">点亮越多，称号越高</text>
+    </view>
+
+    <view wx:if="{{litLocations.length === 0}}" class="mini-empty">
+      <text>还没有点亮点位，去首页探索吧。</text>
+      <button class="jelly-btn ghost mini-btn" bindtap="onGoHome">去首页导览</button>
+    </view>
+
+    <view wx:for="{{litLocations}}" wx:key="id" class="line-item">
+      <text class="line-main">{{item.name}}</text>
+      <text class="line-sub">{{item.shortDesc}}</text>
+    </view>
+  </view>
+
+  <view class="block card">
+    <view class="block-head">
+      <text class="block-title">已收藏活动</text>
+      <text class="block-sub">收藏一下，下次和朋友一起去</text>
+    </view>
+
+    <view wx:if="{{favoriteEvents.length === 0}}" class="mini-empty">
+      <text>你还没有收藏活动，去奇遇页挑一个吧。</text>
+      <button class="jelly-btn ghost mini-btn" bindtap="onGoDiscover">去奇遇页</button>
+    </view>
+
+    <view
+      wx:for="{{favoriteEvents}}"
+      wx:key="id"
+      class="fav-item"
+      data-event-id="{{item.id}}"
+      bindtap="onOpenDetail"
+    >
+      <text class="line-main">{{item.title}}</text>
+      <text class="line-sub">{{item.club}} · {{item.time}}</text>
+      <text class="line-sub">{{item.locationName}}</text>
+    </view>
+  </view>
+
+  <button class="clear-btn" bindtap="onClearRecords">清空本地记录</button>
+</view>

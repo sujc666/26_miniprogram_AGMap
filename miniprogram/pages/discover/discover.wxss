@@ -1,0 +1,153 @@
+.discover-page {
+  background:
+    radial-gradient(circle at 8% 6%, rgba(247, 216, 94, 0.22), transparent 26%),
+    radial-gradient(circle at 92% 16%, rgba(169, 221, 247, 0.24), transparent 30%),
+    linear-gradient(180deg, #FFFBEF 0%, #F5F7EE 100%);
+}
+
+.top {
+  padding: 24rpx;
+  margin-bottom: 18rpx;
+}
+
+.mode-switch-line {
+  margin-top: 12rpx;
+}
+
+.mode-switch-btn {
+  margin: 0;
+  min-height: auto;
+  line-height: 1.2;
+  border: none;
+  border-radius: 999rpx;
+  padding: 10rpx 16rpx;
+  background: #D6EEFC;
+  color: #5f4a33;
+  font-size: 20rpx;
+}
+
+.mode-switch-btn::after {
+  border: none;
+}
+
+.search-wrap {
+  margin-top: 18rpx;
+  border-radius: 999rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  background: #F3F1E8;
+}
+
+.search-input {
+  flex: 1;
+  height: 76rpx;
+  font-size: 26rpx;
+  color: #6B563C;
+}
+
+.search-clear {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  color: #8C7B68;
+}
+
+.category-scroll {
+  width: 100%;
+}
+
+.category-row {
+  display: inline-flex;
+  gap: 12rpx;
+  padding: 6rpx 0 10rpx;
+}
+
+.category-pill {
+  padding: 12rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  color: #6B563C;
+  background: #fff;
+  box-shadow: 0 8rpx 16rpx rgba(107, 86, 60, 0.08);
+}
+
+.category-pill.active {
+  background: linear-gradient(180deg, #DDF3B2 0%, #BFEA7C 100%);
+  font-weight: 700;
+}
+
+.result-tip {
+  margin: 8rpx 0 10rpx;
+  font-size: 22rpx;
+  color: #8C7B68;
+}
+
+.empty-image {
+  width: 160rpx;
+  height: 160rpx;
+  margin: 0 auto 14rpx;
+}
+
+.empty-title {
+  display: block;
+  font-size: 28rpx;
+  color: #6B563C;
+  font-weight: 700;
+}
+
+.empty-copy {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #8C7B68;
+}
+
+.event-card {
+  margin-top: 14rpx;
+  padding: 22rpx;
+}
+
+.event-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.event-title {
+  font-size: 30rpx;
+  color: #5F4A33;
+  font-weight: 700;
+}
+
+.event-category {
+  flex-shrink: 0;
+  font-size: 20rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: #D6EEFC;
+  color: #5F4A33;
+}
+
+.event-club {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 25rpx;
+  color: #6B563C;
+}
+
+.event-meta,
+.event-tags {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #8C7B68;
+}
+
+.event-desc {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.46;
+  color: #6B563C;
+}

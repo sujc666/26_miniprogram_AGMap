@@ -1,0 +1,9 @@
+{
+    "desc": "微仔的奇遇地图 sitemap 配置",
+    "rules": [
+        {
+            "action": "allow",
+            "page": "*"
+        }
+    ]
+}
